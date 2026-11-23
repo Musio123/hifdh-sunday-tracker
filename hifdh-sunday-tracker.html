@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sunday Revision</title>
+<style>
+:root{
+  --paper:#F2F5F0; --ink:#12302C; --muted:#5B6F6A; --rule:#CCD6CF;
+  --green:#1E6B52; --green-bg:#DDEBE3; --gold:#9A6A12; --gold-bg:#F3E8CC; --field:#FFFFFF;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0F1B19; --ink:#E6EFEA; --muted:#93A8A1; --rule:#27403B;
+    --green:#6FCBA3; --green-bg:#173A30; --gold:#E2B659; --gold-bg:#3A2F14; --field:#16282A;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{color-scheme:light dark}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 var(--sans)}
+#app{max-width:520px;margin:0 auto;padding:20px 18px 110px}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+h1{font:600 34px/1.1 var(--serif);margin:0}
+h2{font:600 17px/1.3 var(--sans);margin:28px 0 4px}
+.sub{color:var(--muted);margin:4px 0 0}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.step{display:flex;gap:6px}
+.step button{width:42px;height:42px;border:1px solid var(--rule);border-radius:50%;font-size:20px;line-height:1}
+.step button:disabled{opacity:.3}
+.jump{display:inline-block;margin-top:10px;color:var(--green);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.row{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--rule);width:100%;text-align:left}
+.row .main{flex:1;min-width:0}
+.pages{font:600 28px/1.1 var(--serif);letter-spacing:.2px}
+.meta{color:var(--muted);font-size:14px;margin-top:3px}
+.tag{font-size:13px;font-weight:600;color:var(--gold);background:var(--gold-bg);padding:3px 9px;border-radius:99px;white-space:nowrap}
+.box{width:32px;height:32px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center;flex:none;font-size:18px;color:transparent}
+.done .box{background:var(--green);border-color:var(--green);color:var(--paper)}
+.done .pages{color:var(--muted);text-decoration:line-through;text-decoration-thickness:2px}
+.done .tag{opacity:.55}
+.sum{display:flex;justify-content:space-between;padding:14px 0 0;font-weight:600}
+.pair{display:flex;gap:12px;margin-top:10px}
+.pair div{flex:1}
+.pair label{margin:0 0 6px}
+.wk{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--rule);width:100%;text-align:left}
+.wk .n{font:600 20px var(--serif);width:62px;flex:none}
+.wk .chips{flex:1;color:var(--muted);font-size:14px}
+.wk .st{font-size:13px;font-weight:600;color:var(--muted)}
+.wk.now{border-left:4px solid var(--gold);padding-left:10px}
+.wk.all .st{color:var(--green)}
+.wk.empty{opacity:.5}
+label{display:block;font-weight:600;margin:20px 0 6px}
+input{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:10px;padding:12px}
+.hint{color:var(--muted);font-size:14px;margin:6px 0 0}
+.danger{margin-top:30px;color:#B3261E;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+@media (prefers-color-scheme:dark){.danger{color:#FF9E94}}
+.big{display:flex;align-items:baseline;gap:8px;margin-top:18px}
+.big b{font:600 46px/1 var(--serif)}
+.big span{color:var(--muted);font-size:17px}
+.bar{height:8px;background:var(--rule);border-radius:99px;margin:12px 0 4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:99px}
+.wall{display:grid;grid-template-columns:repeat(30,1fr);gap:2px;margin-top:14px}
+.wall i{aspect-ratio:1;border-radius:2px;border:1px solid var(--rule)}
+.wall .c-mem{background:var(--green-bg);border-color:var(--green)}
+.wall .c-full{background:var(--green);border-color:var(--green)}
+.wall .c-due{background:var(--gold-bg);border-color:var(--gold)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1.5px solid var(--rule)}
+.legend .l-mem::before{background:var(--green-bg);border-color:var(--green)}
+.legend .l-full::before{background:var(--green);border-color:var(--green)}
+.legend .l-due::before{background:var(--gold-bg);border-color:var(--gold)}
+.stat{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--rule)}
+.stat span:first-child{color:var(--muted)}
+.stat span:last-child{font-weight:600;text-align:right}
+.ms{cursor:default}
+.mt{font:600 20px/1.2 var(--serif)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom)}
+nav div{max-width:520px;margin:0 auto;display:flex}
+nav button{flex:1;padding:15px 0;font-weight:600;color:var(--muted);border-top:3px solid transparent}
+nav button[aria-current=true]{color:var(--ink);border-top-color:var(--gold)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav><div>
+  <button data-a="tab" data-v="sunday">Sunday</button>
+  <button data-a="tab" data-v="progress">Progress</button>
+  <button data-a="tab" data-v="schedule">Schedule</button>
+  <button data-a="tab" data-v="setup">Setup</button>
+</div></nav>
+<script>
+const KEY='hifdh-sunday-v1', TOTAL=604, WEEKS=60;
+const S={startDate:'',startPage:1,target:604,perWeek:20,intervals:[0,1,3,6],weeks:{},done:{},tab:'sunday',week:null,confirmReset:false};
+const $=id=>document.getElementById(id);
+
+async function load(){
+  let raw=null;
+  try{ if(window.storage){ const r=await window.storage.get(KEY); raw=r&&r.value; } }catch(e){}
+  if(!raw){ try{ raw=localStorage.getItem(KEY); }catch(e){} }
+  if(raw){ try{ const d=JSON.parse(raw); ['startDate','startPage','target','perWeek','intervals','weeks','done'].forEach(k=>{ if(d[k]!==undefined) S[k]=d[k]; }); }catch(e){} }
+}
+async function persist(){
+  const s=JSON.stringify({startDate:S.startDate,startPage:S.startPage,target:S.target,perWeek:S.perWeek,intervals:S.intervals,weeks:S.weeks,done:S.done});
+  try{ if(window.storage){ await window.storage.set(KEY,s); return; } }catch(e){}
+  try{ localStorage.setItem(KEY,s); }catch(e){}
+}
+
+const wrap=p=>(((p-1)%TOTAL)+TOTAL)%TOTAL+1;
+const cnt=r=>(((r.to-r.from)%TOTAL)+TOTAL)%TOTAL+1;
+function rangeText(r){
+  if(r.from===r.to) return ''+r.from;
+  return r.to>r.from ? r.from+'–'+r.to : r.from+'–'+TOTAL+', 1–'+r.to;
+}
+function suggestFrom(w){
+  for(let k=w-1;k>=1;k--) if(S.weeks[k]) return wrap(S.weeks[k].to+1);
+  return S.startPage;
+}
+function due(w){
+  return S.intervals.map((off,i)=>({b:w-off,off,i})).filter(x=>x.b>=1&&S.weeks[x.b]).sort((x,y)=>y.b-x.b);
+}
+const key=(w,b)=>w+':'+b;
+function parseDate(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function sunday(w){ if(!S.startDate) return null; const d=parseDate(S.startDate); d.setDate(d.getDate()+(w-1)*7+6); return d; }
+const fmt=d=>d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+const fmtY=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+const shortDate=ts=>ts>1e11?new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+const isToday=d=>{ const t=new Date(); return d&&d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()&&d.getDate()===t.getDate(); };
+function curWeek(){
+  if(!S.startDate) return 1;
+  const t=new Date(); t.setHours(0,0,0,0);
+  const diff=Math.floor((t-parseDate(S.startDate))/86400000);
+  return Math.min(WEEKS,Math.max(1,Math.floor(diff/7)+1));
+}
+const viewWeek=()=>S.week||curWeek();
+
+/* ---------- Sunday ---------- */
+function wcText(w){
+  const r=S.weeks[w];
+  if(!r) return 'Enter the first and last page you memorised this week. Planned: about '+S.perWeek+' pages.';
+  return cnt(r)+' page'+(cnt(r)===1?'':'s')+(r.to<r.from?' · runs past page '+TOTAL+' back to 1':'');
+}
+function listHTML(w){
+  const list=due(w);
+  if(!list.length) return '<p class="sub" style="margin-top:12px">Log this week\'s pages above to see what to revise.</p>';
+  const doneN=list.filter(x=>S.done[key(w,x.b)]).length;
+  const pagesN=list.reduce((s,x)=>s+cnt(S.weeks[x.b]),0);
+  const rows=list.map(x=>{
+    const r=S.weeks[x.b], d=S.done[key(w,x.b)];
+    return `<button class="row ${d?'done':''}" data-a="toggle" data-k="${key(w,x.b)}" aria-pressed="${!!d}">
+      <span class="main"><div class="pages">Pages ${rangeText(r)}</div>
+      <div class="meta">${cnt(r)} pages · memorised in week ${x.b}</div></span>
+      <span class="tag">${x.i+1} of ${S.intervals.length}</span>
+      <span class="box" aria-hidden="true">✓</span></button>`;
+  }).join('');
+  return rows+`<div class="sum"><span>${pagesN} pages</span><span>${doneN} of ${list.length} done</span></div>`;
+}
+function sundayView(){
+  const w=viewWeek(), cw=curWeek(), sd=sunday(w), r=S.weeks[w];
+  return `
+  <div class="head"><div><h1>Week ${w}</h1><p class="sub">${sd?'Sunday '+fmt(sd):'Set your start date in Setup to see dates'}</p></div>
+    <div class="step"><button data-a="prev" aria-label="Previous week" ${w<=1?'disabled':''}>‹</button><button data-a="next" aria-label="Next week" ${w>=WEEKS?'disabled':''}>›</button></div></div>
+  ${w!==cw?`<button class="jump" data-a="now">Back to week ${cw}</button>`:''}
+  <h2>New pages this week</h2>
+  <div class="pair">
+    <div><label for="wf">From page</label><input id="wf" type="number" min="1" max="${TOTAL}" inputmode="numeric" value="${r?r.from:suggestFrom(w)}"></div>
+    <div><label for="wt">To page</label><input id="wt" type="number" min="1" max="${TOTAL}" inputmode="numeric" value="${r?r.to:''}" placeholder="last page"></div>
+  </div>
+  <p class="hint" id="wc">${wcText(w)}</p>
+  <h2>Revise on Sunday</h2>
+  <div id="list">${listHTML(w)}</div>`;
+}
+
+/* ---------- Schedule ---------- */
+function scheduleView(){
+  const cw=curWeek(), rows=[];
+  for(let w=1;w<=WEEKS;w++){
+    const l=due(w), n=l.filter(x=>S.done[key(w,x.b)]).length, sd=sunday(w), r=S.weeks[w];
+    const all=l.length&&n===l.length;
+    const bits=[r?'New '+rangeText(r):'Not logged'];
+    if(sd) bits.push(fmt(sd));
+    rows.push(`<button class="wk ${w===cw?'now':''} ${all?'all':''} ${(l.length||r)?'':'empty'}" data-a="open" data-w="${w}">
+      <span class="n">Wk ${w}</span>
+      <span class="chips">${l.map(x=>'B'+x.b).join('  ')||'–'}<br>${bits.join(' · ')}</span>
+      <span class="st">${all?'Done':l.length?n+'/'+l.length:''}</span></button>`);
+  }
+  return `<div class="head"><div><h1>Schedule</h1><p class="sub">B = the batch memorised in that week. Tap a week to open it.</p></div></div>${rows.join('')}`;
+}
+
+/* ---------- Progress ---------- */
+function stats(){
+  let last=0;
+  if(S.startDate){ const t=new Date(); t.setHours(0,0,0,0); for(let w=1;w<=WEEKS;w++){ if(sunday(w)<=t) last=w; } }
+  else Object.keys(S.done).forEach(k=>{ last=Math.max(last,+k.split(':')[0]); });
+  const logged=Object.keys(S.weeks).map(Number).sort((a,b)=>a-b);
+  const memBatches=logged.length;
+  const memPages=logged.reduce((s,w)=>s+cnt(S.weeks[w]),0);
+  let sched=0,got=0;
+  for(let w=1;w<=last;w++) due(w).forEach(x=>{ sched++; if(S.done[key(w,x.b)]) got++; });
+  const allDone=w=>due(w).every(x=>S.done[key(w,x.b)]);
+  let end=last;
+  if(S.startDate&&end>=1&&isToday(sunday(end))&&!allDone(end)) end--;
+  let cur=0; for(let w=end;w>=1&&allDone(w);w--) cur++;
+  let best=0,run=0; for(let w=1;w<=end;w++){ run=allDone(w)?run+1:0; best=Math.max(best,run); }
+  let diff=null,finish=null,lastRev=null;
+  if(S.startDate){
+    diff=memPages-Math.min(S.target,last*S.perWeek);
+    const remaining=Math.max(0,S.target-memPages), maxL=memBatches?logged[memBatches-1]:0;
+    const fw=Math.max(1,Math.min(WEEKS,remaining===0?maxL:Math.max(maxL,last)+Math.ceil(remaining/S.perWeek)));
+    finish=new Date(sunday(fw)); finish.setDate(finish.getDate()-1);
+    lastRev=sunday(Math.min(WEEKS,fw+Math.max(...S.intervals)));
+  }
+  const order=logged.map(w=>S.weeks[w]).sort((a,b)=>(a.at||0)-(b.at||0));
+  let acc=0; const reached=order.map(r=>{ acc+=cnt(r); return {acc,at:r.at}; });
+  return {last,logged,memBatches,memPages,sched,got,cur,best,diff,finish,lastRev,reached};
+}
+function progressView(){
+  const s=stats(), cw=curWeek();
+  const pct=Math.min(100,Math.round(s.memPages/S.target*100));
+  const dueNow=new Set(due(cw).filter(x=>!S.done[key(cw,x.b)]).map(x=>x.b));
+  const st=new Array(TOTAL+1).fill('');
+  s.logged.forEach(w=>{
+    const r=S.weeks[w], full=S.intervals.every(o=>S.done[key(w+o,w)]);
+    const cls=full?'c-full':dueNow.has(w)?'c-due':'c-mem';
+    for(let i=0;i<cnt(r);i++) st[wrap(r.from+i)]=cls;
+  });
+  let wall=''; for(let p=1;p<=TOTAL;p++) wall+=`<i class="${st[p]}"></i>`;
+  const marks=[...new Set([20,100,200,300,400,500].filter(m=>m<S.target).concat(S.target))];
+  const nextIdx=marks.findIndex(m=>s.memPages<m);
+  const msRows=marks.map((m,i)=>{
+    const ach=s.memPages>=m, hit=s.reached.find(x=>x.acc>=m), when=ach&&hit?shortDate(hit.at):'';
+    return `<div class="row ms ${ach?'done':''}"><span class="main"><div class="mt">${m} pages${m===S.target?' · all done':''}</div>
+      <div class="meta">${ach?('Reached'+(when?' on '+when:'')):(m-s.memPages)+' pages to go · '+Math.round(m/S.target*100)+'% of target'}</div></span>
+      ${i===nextIdx?' <span class="tag">Next</span>':''}<span class="box" aria-hidden="true">✓</span></div>`;
+  }).join('');
+  const streakRows=[4,8,12,20].map(n=>{
+    const ach=s.best>=n;
+    return `<div class="row ms ${ach?'done':''}"><span class="main"><div class="mt">${n} Sundays in a row</div>
+      <div class="meta">${ach?'Reached':'All batches ticked, '+n+' Sundays running'}</div></span><span class="box" aria-hidden="true">✓</span></div>`;
+  }).join('');
+  const need='Set a start date in Setup';
+  const pace=s.diff===null?need:s.diff===0?'On plan':s.diff>0?s.diff+' pages ahead':(-s.diff)+' pages behind';
+  const revPct=s.sched?Math.round(s.got/s.sched*100)+'% ('+s.got+' of '+s.sched+')':'Starts after your first Sunday';
+  const avg=s.memBatches?Math.round(s.memPages/s.memBatches)+' pages':'–';
+  return `
+  <div class="head"><div><h1>Progress</h1><p class="sub">${s.memBatches} week${s.memBatches===1?'':'s'} of new pages logged</p></div></div>
+  <div class="big"><b>${s.memPages}</b><span>of ${S.target} pages · ${pct}%</span></div>
+  <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+  <div class="wall" aria-label="Mushaf pages, 30 per row">${wall}</div>
+  <div class="legend"><span class="l-full">Cycle complete</span><span class="l-mem">Memorised</span><span class="l-due">Due this Sunday</span></div>
+  <p class="hint">Each square is one Mushaf page, 30 per row, starting at page 1.</p>
+  <h2>Where you stand</h2>
+  <div class="stat"><span>Revision on schedule</span><span>${revPct}</span></div>
+  <div class="stat"><span>Sunday streak</span><span>${s.cur} now · best ${s.best}</span></div>
+  <div class="stat"><span>Average per week</span><span>${avg}</span></div>
+  <div class="stat"><span>Pace vs ${S.perWeek} a week</span><span>${pace}</span></div>
+  <div class="stat"><span>All pages memorised by</span><span>${s.finish?fmtY(s.finish):need}</span></div>
+  <div class="stat"><span>Last revision Sunday</span><span>${s.lastRev?fmtY(s.lastRev):need}</span></div>
+  <h2>Pages memorised</h2>
+  ${msRows}
+  <h2>Consistency</h2>
+  ${streakRows}`;
+}
+
+/* ---------- Setup ---------- */
+function setupView(){
+  return `<div class="head"><div><h1>Setup</h1></div></div>
+  <label for="sd">Week 1 starts on (a Monday)</label>
+  <input id="sd" type="date" value="${S.startDate}">
+  <p class="hint">Week 1 is the first week you log new pages. Its Sunday is the first revision.</p>
+  <label for="sp">First page of week 1</label>
+  <input id="sp" type="number" min="1" max="${TOTAL}" value="${S.startPage}" inputmode="numeric">
+  <p class="hint">Only a starting suggestion. After that, each week suggests the page after your last one, and you can change it.</p>
+  <label for="tp">Total pages you plan to memorise</label>
+  <input id="tp" type="number" min="1" max="${TOTAL}" value="${S.target}" inputmode="numeric">
+  <p class="hint">Used for the Progress tab. The full Mushaf is ${TOTAL} pages.</p>
+  <label for="pw">Pages you plan per week</label>
+  <input id="pw" type="number" min="1" max="200" value="${S.perWeek}" inputmode="numeric">
+  <p class="hint">Used for pace and finish estimates.</p>
+  <label for="iv">Sundays to revise a batch (weeks after its own)</label>
+  <input id="iv" type="text" value="${S.intervals.join(', ')}" inputmode="numeric">
+  <p class="hint">0, 1, 3, 6 means: its own week, the next week, skip one, then skip two. Add more numbers to keep it going, for example 0, 1, 3, 6, 10.</p>
+  <button class="danger" data-a="reset">${S.confirmReset?'Tap again to erase all ticks':'Clear all ticks'}</button>
+  <p class="hint">This clears revision ticks only. Your logged pages stay.</p>`;
+}
+
+function render(){
+  const v=S.tab;
+  $('app').innerHTML = v==='sunday'?sundayView():v==='progress'?progressView():v==='schedule'?scheduleView():setupView();
+  document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.v===v));
+}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a]'); if(!t) return;
+  const a=t.dataset.a;
+  if(a!=='reset') S.confirmReset=false;
+  if(a==='tab'){ S.tab=t.dataset.v; if(S.tab==='sunday') S.week=null; }
+  else if(a==='toggle'){ const k=t.dataset.k; if(S.done[k]) delete S.done[k]; else S.done[k]=Date.now(); persist(); }
+  else if(a==='prev') S.week=Math.max(1,viewWeek()-1);
+  else if(a==='next') S.week=Math.min(WEEKS,viewWeek()+1);
+  else if(a==='now') S.week=null;
+  else if(a==='open'){ S.week=+t.dataset.w; S.tab='sunday'; }
+  else if(a==='reset'){ if(S.confirmReset){ S.done={}; S.confirmReset=false; persist(); } else S.confirmReset=true; }
+  render();
+  if(a==='tab'||a==='open') window.scrollTo(0,0);
+});
+document.addEventListener('change',e=>{
+  const id=e.target.id;
+  if(id==='wf'||id==='wt'){
+    const w=viewWeek(), fs=$('wf').value.trim(), ts=$('wt').value.trim();
+    const f=parseInt(fs,10), t=parseInt(ts,10), ok=n=>n>=1&&n<=TOTAL;
+    if(ok(f)&&ok(t)){ const old=S.weeks[w]; S.weeks[w]={from:f,to:t,at:old&&old.at?old.at:Date.now()}; }
+    else if(!ts&&S.weeks[w]){ delete S.weeks[w]; }
+    persist();
+    $('wc').textContent=wcText(w);
+    $('list').innerHTML=listHTML(w);
+    return;
+  }
+  if(id==='sd') S.startDate=e.target.value;
+  else if(id==='sp'){ const n=parseInt(e.target.value,10); S.startPage=n>=1&&n<=TOTAL?n:1; }
+  else if(id==='tp'){ const n=parseInt(e.target.value,10); S.target=n>=1&&n<=TOTAL?n:TOTAL; }
+  else if(id==='pw'){ const n=parseInt(e.target.value,10); S.perWeek=n>=1&&n<=200?n:20; }
+  else if(id==='iv'){
+    const arr=[...new Set(e.target.value.split(/[ ,]+/).map(Number).filter(n=>Number.isInteger(n)&&n>=0))].sort((a,b)=>a-b);
+    if(arr.length) S.intervals=arr;
+  } else return;
+  persist(); render();
+});
+
+load().then(render);
+</script>
+</body>
+</html>
